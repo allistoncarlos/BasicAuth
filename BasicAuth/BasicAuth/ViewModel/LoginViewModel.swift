@@ -36,8 +36,47 @@ class LoginViewModel: ObservableObject {
             state = .error(.invalidUsernameOrPassword)
         }
     }
+    
+    func loginWithApple(mock: Bool = false) {
+        state = .loading
+        
+        if mock {
+            // 🔹 Simula um token Apple fake para testes locais
+            let fakeToken = """
+            """
+            Task {
+                await authenticateWithAppleToken(fakeToken)
+            }
+            return
+        }
+        
+        let coordinator = AppleSignInCoordinator()
+        coordinator.completion = { [weak self] result in
+            Task { @MainActor in
+                switch result {
+                case .success(let token):
+                    await self?.authenticateWithAppleToken(token)
+                case .failure(let error):
+                    print("Erro no Apple Sign-In: \(error.localizedDescription)")
+                    self?.state = .error(.invalidUsernameOrPassword)
+                }
+            }
+        }
+        coordinator.startSignInWithAppleFlow()
+    }
 
     private var cancellable = Set<AnyCancellable>()
+    
+    private func authenticateWithAppleToken(_ token: String) async {
+        do {
+            try await authService.loginWithApple(token: token)
+
+            state = .success
+        } catch {
+            print("Erro ao autenticar com backend: \(error.localizedDescription)")
+            state = .error(.invalidUsernameOrPassword)
+        }
+    }
 
     private func saveToken(response: LoginResponse?) {
         if let session = response,

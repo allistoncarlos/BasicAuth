@@ -78,7 +78,13 @@ struct LoginView: View {
                             .foregroundColor(.gray)
                         
                         VStack(spacing: 10) {
-                            Button(action: { /* Iniciar Auth Apple */  }) {
+                            Button(action: {
+#if DEBUG
+                                viewModel.loginWithApple(mock: true)
+#else
+                                viewModel.loginWithApple()
+#endif
+                            }) {
                                 HStack {
                                     Image(systemName: "applelogo")
                                     Text("Entrar com Apple")

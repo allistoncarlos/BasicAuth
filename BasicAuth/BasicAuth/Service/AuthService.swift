@@ -27,6 +27,28 @@ class AuthService: ObservableObject {
         // TODO: Salvar token no Keychain
     }
     
+    func loginWithApple(token: String) async throws {
+        // Monta o corpo da requisição conforme esperado pela sua API
+        struct AppleLoginRequest: Encodable {
+            let appleToken: String
+        }
+
+        let requestBody = AppleLoginRequest(appleToken: token)
+
+        // Faz a chamada ao endpoint do backend
+        let response: LoginResponse = try await networkService.request(
+            endpoint: "User/login/apple",
+            method: "POST",
+            body: requestBody
+        )
+
+        // Atualiza estado e salva token
+        self.authToken = response.accessToken
+        self.isAuthenticated = true
+
+        // TODO: Salvar token no Keychain para persistência
+    }
+    
     func register(firstName: String, lastName: String, username: String, password: String) async throws {
         let requestBody = RegisterRequest(firstName: firstName, lastName: lastName, username: username, password: password)
         // Assumindo que a API retorna um token ou um status de sucesso que pode ser ignorado.
