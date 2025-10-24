@@ -1,6 +1,8 @@
 import SwiftUI
 
 struct LoginView: View {
+    @ObservedObject var viewModel: LoginViewModel
+    
     @State private var username = ""
     @State private var password = ""
     @State private var isLoading = false
@@ -8,7 +10,6 @@ struct LoginView: View {
     @State private var showingRegisterSheet = false
 
     var body: some View {
-
             VStack {
                 Text("Basic Auth")
                     .font(.largeTitle)
@@ -21,8 +22,12 @@ struct LoginView: View {
                         .autocapitalization(.none)
                         .textFieldStyle(.roundedBorder)
                     
-                    SecureField("Senha", text: $password)
-                        .textFieldStyle(.roundedBorder)
+                    SecureField("Senha", text: $password) {
+                        Task {
+                            await viewModel.login(username: username, password: password)
+                        }
+                    }
+                    .textFieldStyle(.roundedBorder)
                 }
                 .padding(.horizontal)
                 
@@ -31,8 +36,12 @@ struct LoginView: View {
                         .foregroundColor(.red)
                         .padding(.top, 10)
                 }
-
-                Button(action: {}) {
+                
+                Button {
+                    Task {
+                        await viewModel.login(username: username, password: password)
+                    }
+                } label: {
                     HStack {
                         Spacer()
                         if isLoading {
@@ -53,8 +62,7 @@ struct LoginView: View {
                 .padding(.top, 20)
                 
                 Divider().padding(.vertical, 20)
-                
-                // MARK: - Autenticação Social
+
                 Text("Ou entre com:")
                     .foregroundColor(.gray)
 
@@ -88,19 +96,23 @@ struct LoginView: View {
                 .padding(.horizontal)
                 
                 Spacer()
-                
-                // MARK: - Botão de Cadastro
+
                 Button("Não tem conta? Cadastre-se") {
                     showingRegisterSheet = true
                 }
                 .padding(.bottom, 20)
+                .sheet(isPresented: $showingRegisterSheet) {
+                    // TODO: Implement RegisterView
+                }
             }
             .padding()
+
     }
+    
 }
 
 struct LoginView_Previews: PreviewProvider {
     static var previews: some View {
-        LoginView()
+        LoginView(viewModel: LoginViewModel())
     }
 }
