@@ -113,7 +113,7 @@ struct LoginView: View {
                         }
                         .padding(.bottom, 20)
                         .sheet(isPresented: $showingRegisterSheet) {
-                            // TODO: Implement RegisterView
+                            RegisterView(viewModel: RegisterViewModel())
                         }
                     }
                     .padding()
