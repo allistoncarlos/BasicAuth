@@ -97,7 +97,9 @@ struct LoginView: View {
                                 .cornerRadius(8)
                             }
                             
-                            Button(action: { /* Iniciar Auth Google */  }) {
+                            Button(action: {
+                                Task { await viewModel.signInWithGoogle() }
+                            }) {
                                 HStack {
                                     Image(systemName: "g.circle.fill")
                                     Text("Entrar com Google")

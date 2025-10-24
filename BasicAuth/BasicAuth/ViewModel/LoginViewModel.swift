@@ -1,4 +1,5 @@
 import Combine
+import GoogleSignIn
 import SwiftUI
 
 enum LoginError: Error, Equatable {
@@ -63,6 +64,23 @@ class LoginViewModel: ObservableObject {
             }
         }
         coordinator.startSignInWithAppleFlow()
+    }
+    
+    func signInWithGoogle() async {
+        guard let presentingViewController = (UIApplication.shared.connectedScenes.first as? UIWindowScene)?.windows.first?.rootViewController else {
+            print("Error: Could not find presenting view controller.")
+            return
+        }
+
+        do {
+            let result = try await GIDSignIn.sharedInstance.signIn(withPresenting: presentingViewController)
+            DispatchQueue.main.async {
+            }
+        } catch {
+            print("Google Sign-In error: \(error.localizedDescription)")
+            DispatchQueue.main.async {
+            }
+        }
     }
 
     private var cancellable = Set<AnyCancellable>()
