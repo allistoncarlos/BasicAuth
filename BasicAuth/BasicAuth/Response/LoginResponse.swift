@@ -1,5 +1,5 @@
 import Foundation
-struct LoginResponse: Equatable {
+struct LoginResponse: Equatable, Decodable {
     // MARK: Lifecycle
 
     init(
